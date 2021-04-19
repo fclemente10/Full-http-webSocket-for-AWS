@@ -1,0 +1,490 @@
+#%RAML 1.0
+title: TFM PROYECTO - Electrical Support 
+baseUri: http://localhost:3000/api/{version}
+version: v1
+
+types:
+    Login:
+        properties:
+            id:
+                required: false
+                type: integer
+            email: string
+            contrasena: string
+
+    Usuario:
+        properties:
+            id:
+                required: false
+                type: integer
+            email: string
+            contrasena: string
+            tipo: string
+            nombre: string
+            apellido: string
+    
+    Vivienda:
+        properties:
+            id:
+                required: false
+                type: integer
+            nombreVivienda: string
+            emailCliente: string
+            pais:
+                required: false
+                type: string
+            ciudad:
+                required: false
+                type: string
+            ubicacion:
+                required: false
+                type: string
+            codigoPostal:
+                required: false
+                type: string
+    
+    Habitacion:
+        properties:
+            id:
+                required: false
+                type: integer
+            nombreVivienda: string
+            nombreHabitacion: string
+            serialNumber:
+                required: false
+                type: string
+
+    infoequipo:
+        properties:
+            id:
+                required: false
+                type: integer
+            serialNumber: string                
+            nombreEquipo:
+                required: false
+                type: string          
+            descripcion:
+                required: false
+                type: string             
+            emailCliente:
+                required: false
+                type: string             
+            lastConn:
+                required: false
+                type: string 
+    
+    Equipo:
+        properties:
+            id:
+                required: false
+                type: integer
+            serialNumber: string
+            onoff: 
+                required: false
+                type: string             
+            accion:
+                required: false
+                type: string             
+            horaInicio:
+                required: false
+                type: string             
+            horaFinal:
+                required: false
+                type: string        
+   
+    Onoff:
+        properties:
+            onoff: string
+            serialNumber: string
+    
+    Datos:
+        properties:
+            id:
+                required: false
+                type: integer
+            serialNumber: string
+            dataTime:
+                required: false
+                type: string
+            tension:
+                required: false
+                type: string
+            corriente:
+                required: false
+                type: string
+            on:
+                required: false
+                type: string
+            off:
+                required: false
+                type: string
+
+/Login:
+    get:
+        description: Obtiene un listado de los usuarios
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: Login[]
+    /{email}:
+        get:
+            description: Obtiene un usuario para session de login
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Login        
+    post:
+        description: Crea una nueva seccion de login
+        body:
+            application/json:
+                type: Login
+        responses:
+            201:
+                description: Login creado. Retorna el identificador del nuevo login
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del nuevo login
+
+/Usuario:
+    get: 
+        description: Obtiene un listado de Usuarios
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: Usuario[]
+    post:
+        description: Crea nuevo Usuario
+        body:
+            application/json:
+                type: Usuario
+        responses:
+            201:
+                description: Usuario creado. Retorna OK
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del nuevo usuario
+    put:
+        description: Actualiza un Usuario
+        headers:
+        body:
+            application/json:
+                type: Usuario 
+        responses: 
+            201:
+                description: Usuario actualizado, retorna OK.
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de un usuario
+    /{email}:
+        get: 
+            description: Obtiene informacion de un usuario especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Usuario[]
+        delete:
+            description: Borra un usuario
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Usuario
+                            description: Identificador de un usuario
+
+/Equipo:
+    get: 
+        description: Obtiene un listado de los equipos Android
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: Equipo[]
+    post:
+        description: Crea nuevo equipo Android
+        body:
+            application/json:
+                type: Equipo
+        responses:
+            201:
+                description: Equipo creado. Retorna nada
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del nuevo equipo Android
+    put:
+        description: Actualiza Equipo Android
+        headers: 
+        body:
+            application/json:
+                type: Equipo
+        responses: 
+            201:
+                description: Equipo Android actualizado, retorna OK.
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del Equipo Android
+    /{serial}:
+        get:
+            description: Obtiene un equipo Android especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Equipo
+        delete:
+            description: Borra equipo Android
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Equipo
+                            description: Identificador del equipo Android borrado
+
+/Infoequipo:
+    get: 
+        description: Obtiene un listado de los equipos controlados por front-end (pagina web)
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: infoequipo[]
+    post:
+        description: Crea nuevo equipo en front-end
+        body:
+            application/json:
+                type: infoequipo
+        responses:
+            201:
+                description: Equipo creado. Retorna nada
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del nuevo equipo front-end
+    put:
+        description: Actualiza Equipo front-end
+        headers:
+        body:
+            application/json:
+                type: infoequipo 
+        responses: 
+            201:
+                description: Equipo para front-end actualizado, retorna OK.
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del Equipo Android
+    /{serial}:
+        get: 
+            description: Obtiene un equipo controlado por front-end
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: infoequipo
+        delete:
+            description: Borra equipo Front-End
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Equipo
+                            description: Identificador del equipo controlado por front end borrado
+    /{emailCliente}:
+        get: 
+            description: Obtiene todos los equipo de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: infoequipo[]
+
+/{Onoff}:
+    put:
+        description: Ejecuta el comando On y OFF en un equipo / Device
+        headers:
+        body:
+            application/json:
+                type: Onoff 
+        responses: 
+            201:
+                description: Comando recibido, retorna OK.
+                body:
+                    application/json:
+                        type: string
+                        description: Control de Comandos a los dispositivos
+
+/Vivienda:
+    get: 
+        description: Obtiene un listado de la viviendas de los uruarios
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: vivienda[]
+    post:
+        description: Crea nueva vivienda de un usuario
+        body:
+            application/json:
+                type: vivienda
+        responses:
+            201:
+                description: Vivienda creada. Retorna nada
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de nueva vivienda
+    put:
+        description: Actualiza una vivienda y sus habitaciones
+        headers:
+        body:
+            application/json:
+                type: vivienda 
+        responses: 
+            201:
+                description: Vivienda actualizada y habitaciones, retorna OK.
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de la vivienda
+    /{nombreVivienda}:
+        get: 
+            description: Obtiene todos las viviendas y habitacioes de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: vivienda[]
+        delete:
+            description: Borra una vivienda y sus habitaciones de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Vivienda
+                            description: Identificador dela vivienda borrada
+
+/habitacion:
+    get: 
+        description: Obtiene todos habitacioes de un cliente
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: habitacion[]
+    post:
+        description: Crea nueva habitacion de un usuario
+        body:
+            application/json:
+                type: habitacion
+        responses:
+            201:
+                description: Habitacion creada. Retorna nada
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de nueva habitacion
+    /{nombreHabitacion}:
+        get: 
+            description: Obtiene una habitacion de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: habitacion
+        put:
+            description: Actualiza una habitacion
+            headers:
+            body:
+                application/json:
+                    type: habitacion 
+            responses: 
+                201:
+                    description: Vivienda actualizada y habitaciones, retorna OK.
+                    body:
+                        application/json:
+                            type: integer
+                            description: Identificador de la vivienda
+        delete:
+            description: Borra una habitacion de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: habitacion
+                            description: Identificador de la habitacion
+/Datos:
+    get: 
+        description: Obtiene todos los datos de los equipos
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: Datos[]
+    post:
+        description: Inserta los datos de un equipo
+        body:
+            application/json:
+                type: Datos
+        responses:
+            201:
+                description: Dato añadido. Retorna nada
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador del dato añadido
+
+    /{serial}:
+        get:
+            description: Obtiene los datos de un equipo especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos[]
+        delete:
+            description: Borra una todos los datos de un equipo especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos
+                            description: Identificador del dato borrado
+    /{id}:
+        get:
+            description: Obtiene una linea de datos de un equipo especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos
+        put:
+            description: Actualiza un dato especifico de un Equipo
+            headers: 
+            body:
+                application/json:
+                    type: Datos
+            responses: 
+                201:
+                    description: Dato actualizado, retorna OK.
+                    body:
+                        application/json:
+                            type: integer
+                            description: Identificador del Dato actualizado
+        delete:
+            description: Borra una linea de datos de un equipo especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos
+                            description: Identificador del dato borrado
+
+      
