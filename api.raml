@@ -96,6 +96,11 @@ types:
         properties:
             onoff: string
             serialNumber: string
+
+    Math:
+        properties:
+            serialNumber: string
+            tipo: string
     
     Datos:
         properties:
@@ -108,10 +113,10 @@ types:
                 type: string
             tension:
                 required: false
-                type: string
+                type: number
             corriente:
                 required: false
-                type: string
+                type: number
             on:
                 required: false
                 type: string
@@ -296,7 +301,9 @@ types:
                     body:
                         application/json:
                             type: Equipo
+
                             description: Identificador del equipo controlado por front end borrado
+/Infoequipos:
     /{emailCliente}:
         get: 
             description: Obtiene todos los equipo de un cliente
@@ -305,21 +312,6 @@ types:
                     body:
                         application/json:
                             type: infoequipo[]
-
-/{Onoff}:
-    put:
-        description: Ejecuta el comando On y OFF en un equipo / Device
-        headers:
-        body:
-            application/json:
-                type: Onoff 
-        responses: 
-            201:
-                description: Comando recibido, retorna OK.
-                body:
-                    application/json:
-                        type: string
-                        description: Control de Comandos a los dispositivos
 
 /Vivienda:
     get: 
@@ -356,12 +348,12 @@ types:
                         description: Identificador de la vivienda
     /{nombreVivienda}:
         get: 
-            description: Obtiene todos las viviendas y habitacioes de un cliente
+            description: Obtiene una viviendas en especifico
             responses:
                 200:
                     body:
                         application/json:
-                            type: vivienda[]
+                            type: vivienda
         delete:
             description: Borra una vivienda y sus habitaciones de un cliente
             responses:
@@ -370,15 +362,34 @@ types:
                         application/json:
                             type: Vivienda
                             description: Identificador dela vivienda borrada
+/Viviendas:
+    /{emailCliente}:
+        get: 
+            description: Obtiene todas las viviendas de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: vivienda
 
-/habitacion:
+/Viviendabyname:
+    /{nombreVivienda}:
+        get: 
+            description: Obtiene informacion de una unica vivienda de un cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: vivienda
+
+/Habitacion:
     get: 
         description: Obtiene todos habitacioes de un cliente
         responses:
             200:
                 body:
                     application/json:
-                        type: habitacion[]
+                        type: habitaciones[]
     post:
         description: Crea nueva habitacion de un usuario
         body:
@@ -391,6 +402,20 @@ types:
                     application/json:
                         type: integer
                         description: Identificador de nueva habitacion
+    put:
+        description: Actualiza una habitacion
+        headers:
+        body:
+            application/json:
+                type: habitacion 
+        responses: 
+            201:
+                description: habitacion actualizada, retorna OK.
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de la vivienda
+
     /{nombreHabitacion}:
         get: 
             description: Obtiene una habitacion de un cliente
@@ -399,19 +424,6 @@ types:
                     body:
                         application/json:
                             type: habitacion
-        put:
-            description: Actualiza una habitacion
-            headers:
-            body:
-                application/json:
-                    type: habitacion 
-            responses: 
-                201:
-                    description: Vivienda actualizada y habitaciones, retorna OK.
-                    body:
-                        application/json:
-                            type: integer
-                            description: Identificador de la vivienda
         delete:
             description: Borra una habitacion de un cliente
             responses:
@@ -420,6 +432,25 @@ types:
                         application/json:
                             type: habitacion
                             description: Identificador de la habitacion
+/HabVivienda:
+    /{nombreVivienda}:
+        get: 
+            description: Obtiene todas las habitaciones de una vivienda
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: habitaciones[]
+
+/Habitaciones:
+    /{emailCliente}:
+        get: 
+        description: Obtiene todas las habitaciones de un cliente
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: habitaciones[] 
 /Datos:
     get: 
         description: Obtiene todos los datos de los equipos
@@ -441,7 +472,7 @@ types:
                         type: integer
                         description: Identificador del dato añadido
 
-    /{serial}:
+    /{serialNumber}:
         get:
             description: Obtiene los datos de un equipo especifico
             responses:
@@ -487,4 +518,71 @@ types:
                             type: Datos
                             description: Identificador del dato borrado
 
-      
+/Informes:
+    /{emailCliente}:
+        get: 
+            description: Obtiene todos los datos de todos los equipos de un unico cliente
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos[]
+
+/Onoff:
+    put:
+        description: Ejecuta el comando On y OFF en un equipo / Device
+        headers:
+        body:
+            application/json:
+                type: Onoff 
+        responses: 
+            201:
+                description: Comando recibido, retorna OK.
+                body:
+                    application/json:
+                        type: string
+                        description: Control de Comandos a los dispositivos
+
+/Math:
+    post:
+        description: Obtiene valor medio de la variable 'tipo' (que esta en la peticion) de un equipo especifico
+        headers:
+        body:
+            application/json:
+                type: Math 
+        responses: 
+            201:
+                description: Comando recibido, retorna OK.
+                body:
+                    application/json:
+                        type: Datos[]
+                        description: Calcula y envia los valores de corriente y tension medio del aparato
+
+/Grafico:
+    /{serialNumber}:
+        get:
+            description: Obtiene los datos de un equipo especifico para montar un grafico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos[]
+/Onuoff:
+    /{serialNumber}:
+        get:
+            description: Obtiene los datos de un equipo especifico para montar un grafico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos[]
+
+/Potencia:
+    /{serialNumber}:
+        get:
+            description: Obtiene a potencia media de un equipo especifico.
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Datos[]
