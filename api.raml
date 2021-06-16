@@ -586,3 +586,50 @@ types:
                     body:
                         application/json:
                             type: Datos[]
+
+/Equiposinhab:
+    /{emailCliente}:
+        get: 
+            description: Obtiene todos numeros seriales de un cliente que no estan registrados en alguna habitacion
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Seriales[]
+
+/Alarm:
+    get: 
+        description: Obtiene un listado de todas las alarmas del sistema
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: alarmas[]
+    post:
+        description: Crea nueva alarma de un usuario
+        body:
+            application/json:
+                type: alarm
+        responses:
+            201:
+                description: Alarma añadida. Retorna Ok
+                body:
+                    application/json:
+                        type: integer
+                        description: Identificador de nueva alarma
+    /{serialNumber}:
+        get:
+            description: Obtiene las alarmas de un equipo especifico.
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Alarmas[]
+        delete:
+            description: Borra todas las alarmas de un equipo especifico
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Alarmas
+                            description: Identificador del dato borrado
