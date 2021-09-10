@@ -1,5 +1,5 @@
 #%RAML 1.0
-title: TFM PROYECTO - Electrical Support 
+title: TFM PROYECTO - mySmartHome 
 baseUri: http://localhost:3000/api/{version}
 version: v1
 
@@ -125,21 +125,7 @@ types:
                 type: string
 
 /Login:
-    get:
-        description: Obtiene un listado de los usuarios
-        responses:
-            200:
-                body:
-                    application/json:
-                        type: Login[]
     /{email}:
-        get:
-            description: Obtiene un usuario para session de login
-            responses:
-                200:
-                    body:
-                        application/json:
-                            type: Login        
     post:
         description: Crea una nueva seccion de login
         body:
@@ -201,7 +187,7 @@ types:
                     body:
                         application/json:
                             type: Usuario
-                            description: Identificador de un usuario
+                            description: Identificador de un usuario borrado
 
 /Equipo:
     get: 
@@ -255,14 +241,14 @@ types:
 
 /Infoequipo:
     get: 
-        description: Obtiene un listado de los equipos controlados por front-end (pagina web)
+        description: Obtiene un listado de los equipos controlados por front-end (pagina web/App)
         responses:
             200:
                 body:
                     application/json:
                         type: infoequipo[]
     post:
-        description: Crea nuevo equipo en front-end
+        description: Crea nuevo equipo en front-end con contenido solamente de informaciones
         body:
             application/json:
                 type: infoequipo
@@ -295,18 +281,18 @@ types:
                         application/json:
                             type: infoequipo
         delete:
-            description: Borra equipo Front-End
+            description: Borra equipo frontend
             responses:
                 200:
                     body:
                         application/json:
                             type: Equipo
 
-                            description: Identificador del equipo controlado por front end borrado
+                            description: Identificador del equipo controlado por frontend borrado
 /Infoequipos:
     /{emailCliente}:
         get: 
-            description: Obtiene todos los equipo de un cliente
+            description: Obtiene todos los equipo de un cliente especifico
             responses:
                 200:
                     body:
@@ -315,20 +301,20 @@ types:
 
 /Vivienda:
     get: 
-        description: Obtiene un listado de la viviendas de los uruarios
+        description: Obtiene un listado de la viviendas de todos uruarios
         responses:
             200:
                 body:
                     application/json:
                         type: vivienda[]
     post:
-        description: Crea nueva vivienda de un usuario
+        description: Crea nueva vivienda para un usuario
         body:
             application/json:
                 type: vivienda
         responses:
             201:
-                description: Vivienda creada. Retorna nada
+                description: Vivienda creada. Retorna ok
                 body:
                     application/json:
                         type: integer
@@ -341,14 +327,14 @@ types:
                 type: vivienda 
         responses: 
             201:
-                description: Vivienda actualizada y habitaciones, retorna OK.
+                description: Vivienda y habitaciones actualizada, retorna OK.
                 body:
                     application/json:
                         type: integer
                         description: Identificador de la vivienda
     /{nombreVivienda}:
         get: 
-            description: Obtiene una viviendas en especifico
+            description: Obtiene una vivienda en especifico
             responses:
                 200:
                     body:
@@ -361,7 +347,7 @@ types:
                     body:
                         application/json:
                             type: Vivienda
-                            description: Identificador dela vivienda borrada
+                            description: Identificador de la vivienda borrada
 /Viviendas:
     /{emailCliente}:
         get: 
@@ -384,7 +370,7 @@ types:
 
 /Habitacion:
     get: 
-        description: Obtiene todos habitacioes de un cliente
+        description: Obtiene todass habitacioes de un cliente
         responses:
             200:
                 body:
@@ -397,7 +383,7 @@ types:
                 type: habitacion
         responses:
             201:
-                description: Habitacion creada. Retorna nada
+                description: Habitacion creada. Retorna ok
                 body:
                     application/json:
                         type: integer
@@ -466,7 +452,7 @@ types:
                 type: Datos
         responses:
             201:
-                description: Dato añadido. Retorna nada
+                description: Dato añadido. Retorna ok
                 body:
                     application/json:
                         type: integer
@@ -530,7 +516,7 @@ types:
 
 /Onoff:
     put:
-        description: Ejecuta el comando On y OFF en un equipo / Device
+        description: Ejecuta el comando On y OFF en un equipo / aparato
         headers:
         body:
             application/json:
@@ -545,7 +531,7 @@ types:
 
 /Math:
     post:
-        description: Obtiene valor medio de la variable 'tipo' (que esta en la peticion) de un equipo especifico
+        description: Obtiene valor medio de la variable 'tipo' que puede ser corriente o tension de un equipo especifico
         headers:
         body:
             application/json:
@@ -580,7 +566,7 @@ types:
 /Potencia:
     /{serialNumber}:
         get:
-            description: Obtiene a potencia media de un equipo especifico.
+            description: Obtiene potencia media de un equipo especifico.
             responses:
                 200:
                     body:

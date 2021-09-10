@@ -37,36 +37,6 @@ connectionDB.connect(function(err) {
     var logger = require("./logger").Logger;
 
     /********************* WEB SOCKET *********************/
-  /*  const serverPort = 3300,
-        http = require("http"),
-
-        server = http.createServer(app),
-        WebSocket = require("ws"),
-        websocketServer = new WebSocket.Server({ server });
-
-    //when a websocket connection is established
-    websocketServer.on('connection', (webSocketClient) => {
-        //send feedback to the incoming connection
-        webSocketClient.send('{ "connection" : "ok"}');
-
-        //when a message is received
-        webSocketClient.on('message', (message) => {
-            console.log(`Received message => ${message}`)
-            //for each websocket client
-            websocketServer
-                .clients
-                .forEach(client => {
-                    //send the client the current message
-                    client.send(message);
-                });
-        });
-    });
-
-    //start the web server
-    server.listen(serverPort, () => {
-        console.log(`Websocket server started on port ` + serverPort);
-    });
-*/
 
     const WebSocket = require('ws');
     const wss = new WebSocket.Server({ port: 3300 });
@@ -99,7 +69,6 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
                 console.log("Error al grabar IP en la base de datos" + error);
                 logger.error("Error al grabar IP en la base de datos" + error);
             }
-            //            console.log(' OK Servidor 200' + JSON.stringify(server));
         });
   });
 
@@ -200,7 +169,6 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
         });
         app.put("/api/v1/usuario", cors(corsOptions), function(req, res) {
             console.log(req.body);
-            console.log(req.body);
             var id = req.body.id;
             var email = req.body.email;
             var contrasena = req.body.contrasena;
@@ -218,11 +186,11 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
                 res.status(200).json(resp);
             });
         });
-        app.delete("/api/v1/usuario/:id", cors(corsOptions), function(req, res) {
-            var id = req.params.id;
-            console.log("id para borrar = ", id);
-            connectionDB.query("DELETE FROM usuario WHERE (id ='" + id + "');", function(error, usuario) {
-                if (error) return res.status(500).send("Error al borrar usuario con id = " + id + "," + error);
+        app.delete("/api/v1/usuario/:email", cors(corsOptions), function(req, res) {
+            var email = req.params.email;
+            console.log("id para borrar = ", email);
+            connectionDB.query("DELETE FROM usuario WHERE (email ='" + email + "');", function(error, usuario) {
+                if (error) return res.status(500).send("Error al borrar usuario con email = " + email + "," + error);
                 res.status(200).json(usuario);
             });
         });
@@ -256,23 +224,22 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
                 if (error) {
                     return res.status(500).send("Error al crear equipo");
                 } 
-     //           return res.status(200).json(equipo);
                 next();
             });        
         });
         app.post("/api/v1/equipo", cors(corsOptions), function(req, res) {
             var serial = req.body.serialNumber;
             var emailCliente = req.body.emailCliente;
-            var lastConn = req.body.lastConn;
-            var sql2 = "INSERT INTO infoequipo (serialNumber, emailCliente, lastConn) VALUES (" +
-             mysql.escape(serial) + "," + mysql.escape(emailCliente) + "," + mysql.escape(lastConn) + ");"      
+            var lastConn = getDateTime();
+            var descripcion = req.bodyDescripcion;
+            var sql2 = "INSERT INTO infoequipo (serialNumber, descripcion, emailCliente, lastConn) VALUES (" +
+                mysql.escape(serial) + "," + mysql.escape(descripcion) + "," + mysql.escape(emailCliente) + "," + mysql.escape(lastConn) + ");"
             connectionDB.query(sql2, function(error, resp) {
                 console.log(error);
                 if (error) {
                      return res.status(500).send("Error al crear equipo en infoequipo");
                 }else {
                     return res.status(200).json(resp);
-     //               return res.redirect('/');
                 }
             });
         });
@@ -308,19 +275,43 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
                 res.status(200).json(equipo);
             });
         });
+        app.delete("/api/v1/equipo/:serial", cors(corsOptions), function(req, res, next) {
+            var serial = req.params.serial;
+            console.log(" borrar serial en datos= ", serial);
+            connectionDB.query("DELETE FROM datos WHERE (serialNumber ='" + serial + "');", function(error, equipo) {
+                if (error) return res.status(500).send("Error al borrar equipo= " + serial + "," + error);
+                next();
+            });
+        });
+        app.delete("/api/v1/equipo/:serial", cors(corsOptions), function(req, res, next) {
+            var serial = req.params.serial;
+            console.log(" borrar serial en alarm= ", serial);
+            connectionDB.query("DELETE FROM alarm WHERE (serialNumber ='" + serial + "');", function(error, equipo) {
+                if (error) return res.status(500).send("Error al borrar equipo= " + serial + "," + error);
+                next();
+            });
+        });
+        app.delete("/api/v1/equipo/:serial", cors(corsOptions), function(req, res, next) {
+            var serial = req.params.serial;
+            console.log(" borrar serial en infoequipo= ", serial);
+            connectionDB.query("DELETE FROM infoequipo WHERE (serialNumber ='" + serial + "');", function(error, equipo) {
+                if (error) return res.status(500).send("Error al borrar equipo= " + serial + "," + error);
+                next();
+            });
+        });
         app.delete("/api/v1/equipo/:serial", cors(corsOptions), function(req, res) {
             var serial = req.params.serial;
             console.log(" borrar serial= ", serial);
-            connectionDB.query("DELETE FROM equipo WHERE (serial ='" + serial + "');", function(error, equipo) {
+            connectionDB.query("DELETE FROM equipo WHERE (serialNumber ='" + serial + "');", function(error, equipo) {
                 if (error) return res.status(500).send("Error al borrar equipo= " + serial + "," + error);
-                res.status(200).json(equipo);
+                return res.status(200).json();
             });
         });
 
         /*>>>******************** INFORMACION de EQUIPOS PARA FRONT END *******************<<<*/
         app.get("/api/v1/infoequipo", cors(corsOptions), function(req, res) {
             connectionDB.query("SELECT * FROM infoequipo", function(error, equipo) {
-                if (error) return res.status(500).send("Error obteniendo devices");
+                if (error) return res.status(500).send("Error obteniendo equipos en infoequipo");
                 res.status(200).json(equipo);
             });
         });
@@ -342,12 +333,11 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
             console.log(req.body);
             var serialNumber = req.body.serialNumber;
             var nombreEquipo = req.body.nombreEquipo;
-            var sitio = req.body.sitio;
             var descripcion = req.body.descripcion;
             var emailCliente = req.body.emailCliente;
-            var lastConn = req.body.lastConn;
-            var sql = "INSERT INTO infoequipo (serialNumber, nombreEquipo, sitio, descripcion, emailCliente, lastConn) VALUES (" +
-                mysql.escape(serialNumber) + "," + mysql.escape(nombreEquipo) + "," + mysql.escape(sitio) + "," + mysql.escape(descripcion) +
+            var lastConn = getDateTime();
+            var sql = "INSERT INTO infoequipo (serialNumber, nombreEquipo, descripcion, emailCliente, lastConn) VALUES (" +
+                mysql.escape(serialNumber) + "," + mysql.escape(nombreEquipo) + "," + mysql.escape(descripcion) +
                 "," + mysql.escape(emailCliente) + "," + mysql.escape(lastConn) + ");"
 
             console.log(sql);
@@ -362,7 +352,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
             var nombreEquipo = req.body.nombreEquipo;
             var descripcion = req.body.descripcion;
             var emailCliente = req.body.emailCliente;
-            var lastConn = req.body.lastConn;
+            var lastConn = getDateTime();
             var sql ="UPDATE infoequipo SET nombreEquipo = " + mysql.escape(nombreEquipo) + ',' +
              " descripcion = " +  mysql.escape(descripcion) + ',' +
               " emailCliente = " +  mysql.escape(emailCliente) +  ',' + " lastConn = " +  mysql.escape(lastConn) +
@@ -422,24 +412,48 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
             console.log(sql);
             connectionDB.query(sql, function(error, resp) {
                 if (error) return res.status(500).send("Error actualizar equipo");
-    //            res.status(200).json(200);
                 next();
             });
         });
-        /**********************Continuacion de Comando ON / OFF  para actualizar Fecha y Hora********************/
-        app.put("/api/v1/onoff", cors(corsOptions), function (req, res) {
+        /**********************Continuacion de Comando ON / OFF  para actualizar Fecha y Hora en INFOEQUIPO********************/
+        app.put("/api/v1/onoff", cors(corsOptions), function (req, res, next) {
             console.log(req.body);
-            var serial = req.body.serialNumber;
+            var serialNumber = req.body.serialNumber;
             var dateTime = getDateTime();
 
-            var sql = "UPDATE infoequipo SET lastConn = " + mysql.escape(dateTime) + " WHERE (serialNumber = " + mysql.escape(serial) + ");"
+            var sql = "UPDATE infoequipo SET lastConn = " + mysql.escape(dateTime) + " WHERE (serialNumber = " + mysql.escape(serialNumber) + ");"
             console.log(sql);
             connectionDB.query(sql, function (error, resp) {
                 if (error) return res.status(500).send("Error=" + error + " actualizar equipo");
-                console.log('resposta datetime=' + resp);
-                res.status(200).json(resp);
+                next();
             });
         });
+        app.put("/api/v1/onoff", cors(corsOptions), function (req, res, next) {
+            var serialNumber = req.body.serialNumber;
+            var dataTime = getDateTime();
+            var tension = 0;
+            var corriente = 0;
+            if (req.body.onoff === '0') {
+                var on = '0';
+                var off = '1';
+            } else {
+                var on = '1';
+                var off = '0';
+            }
+
+            var sql2 = "INSERT INTO datos (serialNumber, dataTime, tension, corriente, `on`, off) VALUES (" +
+                mysql.escape(serialNumber) + "," + mysql.escape(dataTime) + "," + mysql.escape(tension) +
+                "," + mysql.escape(corriente) + "," + mysql.escape(on) + "," + mysql.escape(off) + ");"
+            connectionDB.query(sql2, function (error, resp) {
+                console.log(error);
+                if (error) {
+                    return res.status(500).send("Error: " + error+ " al actualizar Comando On y Off" );
+                } else {
+                    return res.status(200).json(resp);
+                }
+            });
+        });
+
         /********************* VIVIEDAS *********************/
         app.get("/api/v1/vivienda", cors(corsOptions), function(req, res) {
             connectionDB.query("SELECT * FROM vivienda", function(error, viviendas) {
@@ -661,7 +675,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
             var on = req.body.on;
             var off = req.body.off;
 
-            var sql2 = "INSERT INTO datos (serialNumber, dataTime, tension, corriente, on, off) VALUES (" +
+            var sql2 = "INSERT INTO datos (serialNumber, dataTime, tension, corriente, `on`, off) VALUES (" +
                 mysql.escape(serialNumber) + "," + mysql.escape(dataTime) + "," + mysql.escape(tension) +
                 "," + mysql.escape(corriente)+ "," + mysql.escape(on) + "," + mysql.escape(off) + ");"      
             connectionDB.query(sql2, function(error, resp) {
@@ -685,7 +699,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
 
             var sql = "UPDATE datos SET dataTime = " + mysql.escape(dataTime) + ',' +
               " tension = " + mysql.escape(tension) +  " serialNumber = " + mysql.escape(serialNumber) +
-              ',' + " corriente = " + mysql.escape(corriente) + ',' + " on = " + mysql.escape(on) +
+              ',' + " corriente = " + mysql.escape(corriente) + ',' + " `on` = " + mysql.escape(on) +
               ',' + " off = " + mysql.escape(off) + " WHERE (id = " + mysql.escape(id) + ");"
             console.log(sql);
             connectionDB.query(sql, function(error, datos) {
@@ -707,7 +721,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
         app.delete("/api/v1/datos/:serialNumber", cors(corsOptions), function(req, res) {
             var serialNumber = req.params.serialNumber;
             console.log('Borrar datos de=' + serialNumber);
-            connectionDB.query("DELETE FROM datos WHERE (serialNumber =" + serialNumber + ");", function(error, datos) {
+            connectionDB.query("DELETE FROM datos WHERE serialNumber ='" + serialNumber + "';", function(error, datos) {
                 if (error){
                      return res.status(500).send("Error al borrar datos de= " + serialNumber + "," + error);
                 }
@@ -832,8 +846,8 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
                     return res.status(500).send("Error obteniendo seriales disponibles");
                 }
                 if (serial.length == 0) {
-                    console.log("Error. Serial no encontrado");
-                    return res.status(404).send("Error. Serial no encontrada");
+                    console.log("No hay alarmas");
+                    return res.status(200).send();
                 }
                 res.status(200).json(serial);
             });
@@ -862,6 +876,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
     app.use(cors())
     app.use("/api/v1/", function(req, res, next) { // dentro del API
         var token = res.headers['authorization'];
+        console.log('token USER = ' + token);
         if (!token) {
             res.status(403).json('missing token');
             console.error("No se ha indicado token");
@@ -885,6 +900,7 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
 
         // Añadimos el usuario a req para acceder posteriormente.
         req.user = payload.iss;
+        console.log('payload ok user ==' + payload.iss);
         next(); // todo ok, continuar
         
     });
@@ -898,6 +914,8 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
     }, function(err2) { // se ha producido un error cargando el RAML
         console.log("Error cargando RAML: " + JSON.stringify(err2));
     });
+
+    
 
     // Metodos generales
 
@@ -935,6 +953,6 @@ require('dns').lookup(require('os').hostname(), function (err5, ip, fam) {
        // console.log(hours + ":" + minutes);
 
         return myDate
-    };
+    }
     
 });
